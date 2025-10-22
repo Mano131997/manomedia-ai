@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manomedia AI Agent Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <header class="sidebar__header">
+        <h1>AI Agent Hub</h1>
+        <button id="toggleSettings" class="icon-button" title="Instellingen">
+          ⚙️
+        </button>
+      </header>
+      <div class="sidebar__search">
+        <input type="search" id="searchAgents" placeholder="Zoek agents..." />
+      </div>
+      <nav>
+        <ul id="agentList" class="agent-list"></ul>
+      </nav>
+      <button id="addAgent" class="primary-button">Nieuwe agent</button>
+    </aside>
+
+    <main class="content" id="contentArea">
+      <section class="empty-state" id="emptyState">
+        <h2>Selecteer een agent</h2>
+        <p>Gebruik de lijst links om één van je AI agents te kiezen of maak een nieuwe aan.</p>
+      </section>
+
+      <section class="agent-details hidden" id="agentDetails">
+        <header class="agent-details__header">
+          <div>
+            <h2 id="agentName"></h2>
+            <p id="agentRole" class="agent-role"></p>
+          </div>
+          <div class="agent-actions">
+            <button id="editAgent" class="icon-button" title="Bewerken">✏️</button>
+            <button id="deleteAgent" class="icon-button" title="Verwijderen">🗑️</button>
+          </div>
+        </header>
+
+        <article class="agent-info">
+          <h3>Beschrijving</h3>
+          <p id="agentDescription" class="agent-description"></p>
+
+          <h3>Context</h3>
+          <pre id="agentContext" class="agent-context"></pre>
+        </article>
+
+        <section class="chat-panel">
+          <header class="chat-panel__header">
+            <h3>Chat met <span id="agentShortName"></span></h3>
+            <span id="chatStatus" class="chat-status"></span>
+          </header>
+          <div id="chatMessages" class="chat-messages" aria-live="polite"></div>
+          <form id="chatForm" class="chat-form">
+            <textarea id="chatInput" rows="2" placeholder="Schrijf je bericht..." required></textarea>
+            <button type="submit" class="primary-button">Versturen</button>
+          </form>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="agentDialog" class="modal">
+    <form method="dialog" class="modal__content" id="agentForm">
+      <header class="modal__header">
+        <h2 id="agentDialogTitle">Nieuwe agent</h2>
+        <button type="button" class="icon-button" id="closeAgentDialog" title="Sluiten">✖️</button>
+      </header>
+      <label>
+        Naam
+        <input type="text" id="agentNameInput" required maxlength="60" />
+      </label>
+      <label>
+        Rol / korte pitch
+        <input type="text" id="agentRoleInput" required maxlength="120" />
+      </label>
+      <label>
+        Beschrijving
+        <textarea id="agentDescriptionInput" rows="3" placeholder="Waar gebruik je deze agent voor?" required></textarea>
+      </label>
+      <label>
+        Context / systeem prompt
+        <textarea id="agentContextInput" rows="6" placeholder="Plak hier de standaard instructies voor de agent." required></textarea>
+      </label>
+      <menu class="modal__actions">
+        <button type="reset" class="ghost-button" id="cancelAgent">Annuleren</button>
+        <button type="submit" class="primary-button">Opslaan</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <dialog id="settingsDialog" class="modal">
+    <form method="dialog" class="modal__content" id="settingsForm">
+      <header class="modal__header">
+        <h2>Instellingen</h2>
+        <button type="button" class="icon-button" id="closeSettingsDialog" title="Sluiten">✖️</button>
+      </header>
+      <label>
+        OpenAI API key
+        <input type="password" id="openAiKey" placeholder="sk-..." autocomplete="off" />
+        <small>Wordt lokaal opgeslagen in je browser. Gebruik bij voorkeur een key met beperkte rechten.</small>
+      </label>
+      <label class="toggle">
+        <input type="checkbox" id="useOpenAi" />
+        <span>Gebruik echte OpenAI chat</span>
+      </label>
+      <p class="settings-hint">
+        Geen API key ingevuld? Dan reageert de agent met een voorbeeldtekst zodat je de interface kunt testen.
+      </p>
+      <menu class="modal__actions">
+        <button type="reset" class="ghost-button" id="cancelSettings">Sluiten</button>
+        <button type="submit" class="primary-button">Opslaan</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <template id="agentListItemTemplate">
+    <li class="agent-list__item" data-agent-id="">
+      <button class="agent-list__button">
+        <span class="agent-list__name"></span>
+        <span class="agent-list__role"></span>
+      </button>
+    </li>
+  </template>
+
+  <template id="chatMessageTemplate">
+    <article class="chat-message">
+      <div class="chat-message__meta">
+        <span class="chat-message__author"></span>
+        <time class="chat-message__time"></time>
+      </div>
+      <p class="chat-message__body"></p>
+    </article>
+  </template>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
