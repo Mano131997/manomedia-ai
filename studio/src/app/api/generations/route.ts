@@ -35,9 +35,9 @@ export const GET = handle(async (req: Request) => {
 export const POST = handle(async (req: Request) => {
   const user = await apiUser();
   const body = await req.json();
-  let gen;
-  if (body.type === "image") gen = await createImageGeneration(user.id, body);
-  else if (body.type === "video") gen = await createVideoGeneration(user.id, body);
+  let gens;
+  if (body.type === "image") gens = await createImageGeneration(user.id, body);
+  else if (body.type === "video") gens = [await createVideoGeneration(user.id, body)];
   else throw new HttpError(400, "type moet image of video zijn");
-  return Response.json(serializeGeneration({ ...gen, user: { name: user.name } }));
+  return Response.json(gens.map((g) => serializeGeneration({ ...g, user: { name: user.name } })));
 });

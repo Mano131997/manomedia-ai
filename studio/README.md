@@ -8,7 +8,7 @@ Interne webapp om met het team AI-beelden en -video's te maken, in de stijl van 
 - **Galerij**: al het werk van het team, met zoeken en download.
 - **Team** (admins): collega's toegang geven of intrekken, maandbudget per persoon, kosten per model.
 
-Beelden en video's komen van modellen op [fal.ai](https://fal.ai) (Nano Banana, FLUX, Kling). De chat draait op Claude.
+Beelden en video's komen via de [Higgsfield API](https://docs.higgsfield.ai) (Seedream, FLUX Kontext, Kling), optioneel aangevuld met modellen van [fal.ai](https://fal.ai). De chat draait op Claude.
 Zonder sleutels draait de app in **demo-modus**: placeholderbeelden, geen video, geen chat.
 
 ## Opstarten
@@ -17,7 +17,7 @@ Nodig: Node.js 20 of nieuwer.
 
 ```bash
 cd studio
-cp .env.example .env          # vul SESSION_SECRET, FAL_KEY en ANTHROPIC_API_KEY in
+cp .env.example .env          # vul SESSION_SECRET, HF_KEY en ANTHROPIC_API_KEY in
 npm install
 npm run db:push               # maakt de database aan
 npm run create-admin -- jij@manomedia.be "Jouw Naam" "een-sterk-wachtwoord"
@@ -31,22 +31,23 @@ Open http://localhost:3000 en log in. Collega's voeg je toe via **Team**.
 | variabele | waar te halen | waarvoor |
 | --- | --- | --- |
 | `SESSION_SECRET` | `openssl rand -hex 32` | inlogsessies |
-| `FAL_KEY` | fal.ai → Dashboard → Keys (prepaid tegoed) | beelden en video |
+| `HF_KEY` | cloud.higgsfield.ai → API keys, als `KEY_ID:KEY_SECRET` (prepaid tegoed) | beelden en video |
+| `FAL_KEY` (optioneel) | fal.ai → Dashboard → Keys | extra modellen van fal.ai |
 | `ANTHROPIC_API_KEY` | platform.claude.com → API keys | chat |
 
 ## Kosten
 
-Elke generatie kost geld bij fal.ai (per beeld of per seconde video) en de chat bij Anthropic (per token).
+Elke generatie kost geld bij Higgsfield of fal.ai (per beeld of per seconde video) en de chat bij Anthropic (per token).
 De app houdt per persoon een **schatting** bij in dollar; de bedragen per model staan in `src/lib/models.ts`.
-Echte kosten zie je in de dashboards van fal.ai en Anthropic. Zet een maandbudget per collega via **Team**.
+Echte kosten zie je in de dashboards van Higgsfield, fal.ai en Anthropic. Zet een maandbudget per collega via **Team**.
 
 ## Techniek
 
 - Next.js 15 (App Router) + TypeScript, Prisma, SQLite (één bestand, `prisma/studio.db`).
   Voor Postgres: zet `provider = "postgresql"` in `prisma/schema.prisma` en pas `DATABASE_URL` aan.
 - Bestanden staan op schijf in `STORAGE_DIR` en worden alleen aan ingelogde gebruikers geserveerd.
-- Modellen toevoegen of wisselen: `src/lib/models.ts` (endpoint en invoervelden komen van de API-pagina van het model op fal.ai).
-- Video-jobs lopen asynchroon bij fal.ai; de app vraagt de status op wanneer iemand de pagina open heeft.
+- Modellen toevoegen of wisselen: `src/lib/models.ts` (endpoint en invoervelden staan op de API-pagina van elk model: docs.higgsfield.ai/docs/models of fal.ai/models). Alleen modellen waarvan de sleutel ingevuld is, verschijnen in de app.
+- Generaties lopen asynchroon bij de provider (`src/lib/providers.ts`); de app vraagt de status op wanneer iemand de pagina open heeft.
 - Chat: `src/lib/chat.ts`, Claude met één tool (`generate_image`) en de volledige gespreksgeschiedenis in de database.
 
 ## Online zetten

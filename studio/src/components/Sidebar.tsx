@@ -23,7 +23,7 @@ export function Sidebar({ name, isAdmin, demo }: { name: string; isAdmin: boolea
         </Link>
       ))}
       <div className="sidebar-foot">
-        {demo && <span className="badge" title="Geen FAL_KEY ingesteld">Demo-modus</span>}
+        {demo && <span className="badge" title="Geen HF_KEY of FAL_KEY ingesteld">Demo-modus</span>}
         <Link href="/account" className="muted">{name}</Link>
         <button
           className="btn btn-sm"

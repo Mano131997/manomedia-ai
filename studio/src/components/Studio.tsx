@@ -80,9 +80,10 @@ export function Studio({
         type === "image"
           ? { type, model, prompt, aspectRatio: aspect, count, referenceAssetIds: refs.slice(0, maxRefs) }
           : { type, model, prompt, aspectRatio: aspect, duration, startAssetId: maxRefs ? refs[0] : undefined };
-      const gen = await api<GenerationDTO>("/api/generations", { method: "POST", json: body });
-      setItems((prev) => [gen, ...prev]);
-      if (gen.status === "failed") setError(gen.error ?? "Mislukt");
+      const gens = await api<GenerationDTO[]>("/api/generations", { method: "POST", json: body });
+      setItems((prev) => [...gens, ...prev]);
+      const failed = gens.find((g) => g.status === "failed");
+      if (failed) setError(failed.error ?? "Mislukt");
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -162,11 +163,11 @@ export function Studio({
           </>
         )}
 
-        {!(type === "video" && refs.length && maxRefs) && (
+        {(type === "image" || (!(refs.length && maxRefs) && (videoModel?.aspectRatios.length ?? 0) > 0)) && (
           <>
             <span className="label">Formaat</span>
             <div className="seg">
-              {ASPECTS.filter((a) => type === "image" || ["16:9", "9:16", "1:1"].includes(a)).map((a) => (
+              {(type === "image" ? ASPECTS : videoModel?.aspectRatios ?? []).map((a) => (
                 <button key={a} aria-pressed={a === aspect} onClick={() => setAspect(a)}>{a}</button>
               ))}
             </div>

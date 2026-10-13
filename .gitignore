@@ -205,3 +205,6 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# The studio app keeps its source in src/lib (not a Python build dir)
+!studio/src/lib/
