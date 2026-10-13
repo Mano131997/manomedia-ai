@@ -50,8 +50,23 @@ Echte kosten zie je in de dashboards van Higgsfield, fal.ai en Anthropic. Zet ee
 - Generaties lopen asynchroon bij de provider (`src/lib/providers.ts`); de app vraagt de status op wanneer iemand de pagina open heeft.
 - Chat: `src/lib/chat.ts`, Claude met één tool (`generate_image`) en de volledige gespreksgeschiedenis in de database.
 
-## Online zetten
+## Online zetten (server)
 
-Draai het op een server of VPS met een vaste schijf (database en bestanden staan lokaal), achter HTTPS
-(bv. Caddy of nginx). Serverless hosting zoals Vercel past niet zonder eerst opslag naar S3/R2 en de
-database naar Postgres te verhuizen.
+De eenvoudigste weg: een kleine Linux-server (VPS, bv. Hetzner CX22, ongeveer €5 per maand) met Docker.
+Caddy regelt automatisch het HTTPS-certificaat.
+
+1. **Domein**: maak bij je domeinbeheerder een A-record, bv. `studio.manomedia.be` → het IP-adres van de server.
+2. **Server**: installeer Docker (`curl -fsSL https://get.docker.com | sh`) en haal de code op:
+   ```bash
+   git clone https://github.com/Mano131997/manomedia-ai.git && cd manomedia-ai/studio
+   cp .env.example .env && nano .env
+   ```
+   Vul in: `SESSION_SECRET` (`openssl rand -hex 32`), `HF_KEY`, `ANTHROPIC_API_KEY`, `DOMAIN`,
+   en `ADMIN_EMAIL` / `ADMIN_NAME` / `ADMIN_PASSWORD` voor het eerste admin-account.
+3. **Starten**: `docker compose up -d --build`. Na een minuut staat de app op `https://DOMAIN`.
+4. **Bijwerken** na nieuwe code: `git pull && docker compose up -d --build`.
+
+Database en bestanden staan in het Docker-volume `studio-data` en blijven bewaard bij updates.
+Maak er af en toe een back-up van (`docker run --rm -v studio_studio-data:/data -v $PWD:/b alpine tar czf /b/backup.tgz /data`).
+
+Serverless hosting zoals Vercel past niet zonder eerst opslag naar S3/R2 en de database naar Postgres te verhuizen.

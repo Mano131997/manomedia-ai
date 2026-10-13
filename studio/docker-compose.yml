@@ -1,0 +1,30 @@
+# Run on a server with Docker:  docker compose up -d
+# Fill in .env first (see .env.example). DOMAIN must point to this server for HTTPS.
+services:
+  studio:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: file:/data/studio.db
+      STORAGE_DIR: /data/storage
+    volumes:
+      - studio-data:/data
+
+  caddy:
+    image: caddy:2.10
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?Zet DOMAIN in .env, bv. studio.manomedia.be}
+    command: caddy reverse-proxy --from ${DOMAIN} --to studio:3000
+    volumes:
+      - caddy-data:/data
+    depends_on:
+      - studio
+
+volumes:
+  studio-data:
+  caddy-data:
