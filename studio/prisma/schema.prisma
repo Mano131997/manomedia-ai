@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  name         String
+  passwordHash String
+  role         String         @default("member") // admin | member
+  active       Boolean        @default(true)
+  // Monthly spend limit in US dollar cents (providers bill in USD). 0 = no limit.
+  budgetCents  Int            @default(0)
+  createdAt    DateTime       @default(now())
+  generations  Generation[]
+  assets       Asset[]
+  chats        Conversation[]
+  usage        UsageEvent[]
+}
+
+model Asset {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind       String // upload | output
+  mime       String
+  fileName   String
+  storageKey String
+  size       Int
+  createdAt  DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model Generation {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type         String // image | video
+  source       String   @default("studio") // studio | chat
+  model        String
+  prompt       String
+  settings     String   @default("{}") // JSON
+  inputAssetIds String  @default("[]") // JSON array
+  outputAssetIds String @default("[]") // JSON array
+  status       String   @default("queued") // queued | running | done | failed
+  error        String?
+  providerStatusUrl   String?
+  providerResponseUrl String?
+  costCents    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+  @@index([status])
+}
+
+model Conversation {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String        @default("Nieuw gesprek")
+  costCents Int           @default(0)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+
+  @@index([userId, updatedAt])
+}
+
+model ChatMessage {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  seq            Int
+  role           String // user | assistant
+  // Content blocks as sent to / received from the Claude API (JSON).
+  // Images are stored as {"type":"asset_image","assetId":...} and expanded on replay.
+  apiContent     String
+  createdAt      DateTime     @default(now())
+
+  @@unique([conversationId, seq])
+}
+
+// Every paid call (image, video, chat) leaves one row; used for the usage page and budgets.
+model UsageEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      String // image | video | chat
+  model     String
+  cents     Float
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}

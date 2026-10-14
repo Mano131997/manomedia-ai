@@ -1,0 +1,28 @@
+feature,area,priority,original,clone,notes
+Inloggen met e-mail of Google (alleen uitgenodigde collega's),toegang,must,yes,no,intern: geen publieke registratie
+Admin nodigt collega's uit en trekt toegang in,toegang,must,no,no,eigen toevoeging voor intern gebruik
+Afbeelding genereren uit een prompt,genereren,must,yes,no,via officiële API's met eigen sleutel
+Video genereren uit een prompt (tekst naar video),genereren,must,yes,no,
+Afbeelding naar video (startbeeld uploaden),genereren,must,yes,no,
+Modelkiezer (meerdere image- en videomodellen),genereren,must,yes,no,
+Instellingen: beeldverhouding / resolutie / duur / aantal,genereren,must,yes,no,
+Referentiebeeld uploaden bij een prompt,upload,must,yes,no,
+Voortgang tonen terwijl een job loopt (wachtrij),genereren,must,yes,no,video duurt minuten: async jobs
+Galerij / historiek van alle generaties,bibliotheek,must,yes,no,
+Resultaat downloaden (PNG/JPG/MP4),download,must,yes,no,
+Chat-modus: in gesprek ontwerp maken en bijsturen (zoals ChatGPT),chat,must,partial,no,ChatGPT-stijl; LLM roept image-tool aan
+In chat een afbeelding uploaden en laten aanpassen,chat,must,partial,no,
+Prompt hergebruiken / opnieuw genereren met zelfde instellingen,genereren,should,yes,no,
+Bewerken: upscale / achtergrond verwijderen / outpaint,bewerken,should,yes,no,
+Gedeelde teambibliotheek (iedereen ziet elkaars werk),bibliotheek,should,partial,no,
+Mappen / projecten om werk te ordenen,bibliotheek,should,yes,no,
+Kostenoverzicht per gebruiker (credits / euro),beheer,should,yes,no,API kost per beeld en per seconde video
+Budgetlimiet per gebruiker,beheer,should,no,no,eigen toevoeging
+Presets / sjablonen (vaste stijlen voor ManoMedia),genereren,should,yes,no,eigen presets i.p.v. hun bibliotheek
+Personage consistent houden over beelden (zoals Soul ID),genereren,could,yes,no,afhankelijk van model
+Lipsync / face swap / andere apps,apps,could,yes,no,
+Delen via link,delen,could,yes,no,
+Eigen getrainde Higgsfield-modellen (Soul / Cinema Studio),modellen,could,yes,skip,eigendom van Higgsfield; alleen bruikbaar via hun officiële API indien aangeboden
+Hun presetbibliotheek en voorbeeldvideo's,inhoud,could,yes,skip,content van Higgsfield; wij maken eigen presets
+Community / publieke feed,community,could,yes,skip,niet nodig voor intern gebruik
+Abonnementen en betalingen,betalen,could,yes,skip,intern: geen betaalmuur
